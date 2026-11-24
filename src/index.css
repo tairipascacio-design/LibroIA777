@@ -1,0 +1,160 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+}
+
+.font-book {
+  font-family: 'EB Garamond', 'Cormorant Garamond', 'Lora', Georgia, serif;
+}
+
+.font-display-book {
+  font-family: 'Playfair Display', 'Cinzel', Georgia, serif;
+}
+
+.font-cinzel {
+  font-family: 'Cinzel', serif;
+}
+
+/* Joyful, Vibrant Themes */
+.theme-sunset {
+  --primary-gradient: linear-gradient(135deg, #ff5e62 0%, #ff9966 100%);
+  --accent-color: #ff6b4a;
+  --bg-gradient: radial-gradient(circle at top left, #2d1810 0%, #170d09 60%, #100806 100%);
+  --card-bg: rgba(45, 24, 16, 0.7);
+  --card-border: rgba(255, 107, 74, 0.25);
+  --badge-bg: rgba(255, 107, 74, 0.15);
+  --badge-text: #ff9d7e;
+}
+
+.theme-fiesta {
+  --primary-gradient: linear-gradient(135deg, #f43f5e 0%, #ec4899 50%, #fbbf24 100%);
+  --accent-color: #f43f5e;
+  --bg-gradient: radial-gradient(circle at top left, #2b0e1e 0%, #180812 60%, #10040c 100%);
+  --card-bg: rgba(43, 14, 30, 0.7);
+  --card-border: rgba(244, 63, 94, 0.25);
+  --badge-bg: rgba(244, 63, 94, 0.15);
+  --badge-text: #fca5a5;
+}
+
+.theme-ocean {
+  --primary-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 50%, #10b981 100%);
+  --accent-color: #06b6d4;
+  --bg-gradient: radial-gradient(circle at top left, #08232c 0%, #06151c 60%, #030c10 100%);
+  --card-bg: rgba(8, 35, 44, 0.7);
+  --card-border: rgba(6, 182, 212, 0.25);
+  --badge-bg: rgba(6, 182, 212, 0.15);
+  --badge-text: #67e8f9;
+}
+
+.theme-violet {
+  --primary-gradient: linear-gradient(135deg, #8b5cf6 0%, #d946ef 50%, #fb7185 100%);
+  --accent-color: #8b5cf6;
+  --bg-gradient: radial-gradient(circle at top left, #1f1135 0%, #120a20 60%, #0b0514 100%);
+  --card-bg: rgba(31, 17, 53, 0.7);
+  --card-border: rgba(139, 92, 246, 0.25);
+  --badge-bg: rgba(139, 92, 246, 0.15);
+  --badge-text: #c4b5fd;
+}
+
+/* Realistic & Vibrant Book Paper Textures */
+.paper-classic {
+  background: linear-gradient(to right, #fffdf2, #fffbf0);
+  color: #261f18;
+  box-shadow: inset 0 0 30px rgba(245, 158, 11, 0.08);
+}
+.paper-classic .book-drop-cap::first-letter {
+  color: #d97706;
+}
+
+.paper-peach {
+  background: linear-gradient(to right, #fff5eb, #ffefe0);
+  color: #2b1810;
+  box-shadow: inset 0 0 35px rgba(251, 146, 60, 0.12);
+}
+.paper-peach .book-drop-cap::first-letter {
+  color: #ea580c;
+}
+
+.paper-mint {
+  background: linear-gradient(to right, #f2fbf7, #e8f8f0);
+  color: #0f291e;
+  box-shadow: inset 0 0 35px rgba(16, 185, 129, 0.1);
+}
+.paper-mint .book-drop-cap::first-letter {
+  color: #059669;
+}
+
+.paper-lavender {
+  background: linear-gradient(to right, #faf5ff, #f3e8ff);
+  color: #241438;
+  box-shadow: inset 0 0 35px rgba(168, 85, 247, 0.1);
+}
+.paper-lavender .book-drop-cap::first-letter {
+  color: #7c3aed;
+}
+
+/* Book spine center shadow for 2-page view */
+.book-gutter-left {
+  box-shadow: inset -16px 0 24px -12px rgba(60, 40, 20, 0.15);
+}
+
+.book-gutter-right {
+  box-shadow: inset 16px 0 24px -12px rgba(60, 40, 20, 0.15);
+}
+
+/* Drop cap for first paragraph */
+.book-drop-cap::first-letter {
+  float: left;
+  font-family: 'Cinzel', 'Playfair Display', serif;
+  font-size: 3.4em;
+  line-height: 0.8;
+  padding-top: 4px;
+  padding-right: 10px;
+  padding-bottom: 2px;
+  font-weight: 700;
+}
+
+/* Joyful Glowing Pulse Animations */
+@keyframes rainbowGlow {
+  0% { filter: hue-rotate(0deg); }
+  50% { filter: hue-rotate(60deg); }
+  100% { filter: hue-rotate(0deg); }
+}
+
+.glow-rainbow {
+  animation: rainbowGlow 6s ease-in-out infinite;
+}
+
+/* Custom subtle scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 120, 80, 0.3);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 120, 80, 0.6);
+}
+
+/* Print manuscript styles */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-page {
+    page-break-after: always;
+    box-shadow: none !important;
+  }
+}

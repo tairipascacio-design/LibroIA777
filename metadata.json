@@ -1,0 +1,6 @@
+{
+  "name": "Voz a Libro - Estudio de Escritura Inteligente",
+  "description": "Dicta tu libro por voz en cualquier orden y la IA lo transcribe, organiza cronológicamente y redacta con formato literario profesional.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

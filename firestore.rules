@@ -1,0 +1,159 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Pillar 4.1: Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isVerifiedUser() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isVerifiedUser() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['uid', 'email', 'plan', 'aiOrganizeCount', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['uid', 'email', 'displayName', 'photoURL', 'plan', 'aiOrganizeCount', 'createdAt', 'updatedAt']) &&
+        isValidId(data.uid) &&
+        data.uid == request.auth.uid &&
+        data.email is string && data.email.size() >= 3 && data.email.size() <= 320 &&
+        (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 120)) &&
+        (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() <= 500)) &&
+        data.plan in ['free', 'pro'] &&
+        data.aiOrganizeCount is int && data.aiOrganizeCount >= 0 && data.aiOrganizeCount <= 1000000 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidBookRecord(data) {
+      return data.keys().hasAll([
+          'id', 'ownerId', 'title', 'author', 'genre', 'tone', 'synopsis',
+          'chapters', 'characters', 'timeline', 'dictationHistory', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'ownerId', 'title', 'subtitle', 'author', 'genre', 'tone', 'synopsis',
+          'chapters', 'characters', 'timeline', 'dictationHistory', 'isDemo', 'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.id) &&
+        isValidId(data.ownerId) &&
+        data.ownerId == request.auth.uid &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+        (!('subtitle' in data) || (data.subtitle is string && data.subtitle.size() <= 200)) &&
+        data.author is string && data.author.size() <= 120 &&
+        data.genre is string && data.genre.size() >= 1 && data.genre.size() <= 80 &&
+        data.tone is string && data.tone.size() >= 1 && data.tone.size() <= 100 &&
+        data.synopsis is string && data.synopsis.size() <= 2000 &&
+        (!('isDemo' in data) || data.isDemo is bool) &&
+        data.chapters is list && data.chapters.size() <= 100 && (data.chapters.size() == 0 || data.chapters[0] is map) &&
+        data.characters is list && data.characters.size() <= 100 && (data.characters.size() == 0 || data.characters[0] is map) &&
+        data.timeline is list && data.timeline.size() <= 200 && (data.timeline.size() == 0 || data.timeline[0] is map) &&
+        data.dictationHistory is list && data.dictationHistory.size() <= 200 && (data.dictationHistory.size() == 0 || data.dictationHistory[0] is map) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    match /admins/{adminId} {
+      allow get: if isSignedIn() && request.auth.uid == adminId;
+      allow list, write: if false;
+    }
+
+    match /users/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if false;
+
+      allow create: if isValidId(userId) &&
+        isOwner(userId) &&
+        isValidUserProfile(incoming()) &&
+        incoming().uid == userId &&
+        incoming().plan == 'free' &&
+        incoming().aiOrganizeCount == 0 &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+
+      allow update: if isValidId(userId) &&
+        isValidUserProfile(incoming()) && (
+          isAdmin() ||
+          (
+            isOwner(userId) &&
+            incoming().uid == existing().uid &&
+            incoming().email == existing().email &&
+            incoming().plan == existing().plan &&
+            incoming().createdAt == existing().createdAt &&
+            incoming().updatedAt == request.time &&
+            incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL', 'aiOrganizeCount', 'updatedAt'])
+          )
+        );
+
+      allow delete: if isValidId(userId) && isAdmin();
+
+      match /books/{bookId} {
+        allow get: if isValidId(userId) &&
+          isValidId(bookId) &&
+          (isOwner(userId) || isAdmin()) &&
+          exists(/databases/$(database)/documents/users/$(userId));
+
+        allow list: if isValidId(userId) &&
+          isOwner(userId) &&
+          existing().ownerId == request.auth.uid;
+
+        allow create: if isValidId(userId) &&
+          isValidId(bookId) &&
+          isOwner(userId) &&
+          isValidBookRecord(incoming()) &&
+          incoming().id == bookId &&
+          incoming().ownerId == userId &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          exists(/databases/$(database)/documents/users/$(userId));
+
+        allow update: if isValidId(userId) &&
+          isValidId(bookId) &&
+          isValidBookRecord(incoming()) && (
+            isAdmin() ||
+            (
+              isOwner(userId) &&
+              incoming().id == existing().id &&
+              incoming().ownerId == existing().ownerId &&
+              incoming().createdAt == existing().createdAt &&
+              incoming().updatedAt == request.time &&
+              exists(/databases/$(database)/documents/users/$(userId)) &&
+              incoming().diff(existing()).affectedKeys().hasOnly([
+                'title', 'subtitle', 'author', 'genre', 'tone', 'synopsis',
+                'chapters', 'characters', 'timeline', 'dictationHistory', 'isDemo', 'updatedAt'
+              ])
+            )
+          );
+
+        allow delete: if isValidId(userId) &&
+          isValidId(bookId) &&
+          (isOwner(userId) || isAdmin()) &&
+          exists(/databases/$(database)/documents/users/$(userId));
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="50%" stop-color="#f43f5e" />
+      <stop offset="100%" stop-color="#8b5cf6" />
+    </linearGradient>
+    <linearGradient id="page" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fffdf5" />
+      <stop offset="100%" stop-color="#fde68a" />
+    </linearGradient>
+  </defs>
+  <!-- Full-bleed background for maskable safe-zone -->
+  <rect width="512" height="512" fill="url(#bg)" />
+  <!-- Scaled down to 72% centered inside safe zone -->
+  <g transform="translate(72, 72) scale(0.72)">
+    <path d="M96 168 C96 152 110 140 128 140 L244 156 L244 372 L120 356 C106 354 96 342 96 328 Z" fill="url(#page)" opacity="0.96"/>
+    <path d="M416 168 C416 152 402 140 384 140 L268 156 L268 372 L392 356 C406 354 416 342 416 328 Z" fill="url(#page)" opacity="0.96"/>
+    <rect x="248" y="154" width="16" height="220" rx="8" fill="#7c2d12" opacity="0.35"/>
+    <circle cx="256" cy="248" r="76" fill="#1c1917" stroke="#fbbf24" stroke-width="8"/>
+    <rect x="236" y="204" width="40" height="62" rx="20" fill="#fbbf24"/>
+    <path d="M220 250 C220 272 236 288 256 288 C276 288 292 272 292 250" fill="none" stroke="#f43f5e" stroke-width="10" stroke-linecap="round"/>
+    <line x1="256" y1="288" x2="256" y2="308" stroke="#f43f5e" stroke-width="10" stroke-linecap="round"/>
+    <line x1="238" y1="308" x2="274" y2="308" stroke="#f43f5e" stroke-width="10" stroke-linecap="round"/>
+  </g>
+</svg>
